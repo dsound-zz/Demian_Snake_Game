@@ -1,107 +1,98 @@
 // set variables
 const table = document.querySelector("table");
 const gridSize = Math.floor(Math.random() * 5 + 10);
-let snakeIndex = Math.floor(Math.random() * (gridSize * gridSize)) + 1;
-const defaultColor = "aquamarine";
+let currentSnakeIndex = Math.floor(Math.random() * (gridSize * gridSize)) + 1;
+let nextSnakeIndex = currentSnakeIndex;
+const gridColor = "aquamarine";
 const snakeColor = "grey";
 const gridArray = [];
-const snakeArray = [];
-
+let snakeCells;
 // build grid (board)
 const buildGrid = () => {
   let grid = "";
-  let cellCount = 0;
+  let count = 0;
   for (let i = 0; i < gridSize; i++) {
-    grid += `<tr class=row${i}>`;
+    grid += `<tr>`;
     for (let j = 0; j < gridSize; j++) {
-      grid += `<td class=cell${cellCount}></td>`;
-      cellCount++;
-      gridArray.push({ cell: cellCount, isSnake: false });
+      grid += `<td id=${count}></td>`;
+      gridArray.push(`<td id=${count}></td>`);
+      count++;
     }
-    grid += "</tr>";
+    grid += `</tr>`;
   }
-
   table.innerHTML = grid;
-
-  // set random player square
-  const initialSnake = [];
-  initialSnakeCell = document.querySelector(`.cell${snakeIndex}`);
-  initialSnakeCell.style.background = snakeColor;
-  initialSnakeCell.isSnake = true;
-  // gridState(initialSnakeCell, snakeIndex);
-  // build grid data array
+  setSnake(currentSnakeIndex);
 };
 
-// const gridState = (currentSnake, gridIndex) => {
-//   let prevSnakePos = gridArray[]
-//   console.log(currentSnake, gridArray);
-// };
+const setSnake = (current, next) => {
+  let newSnakeCell = document.getElementById(current - 1);
+  let currentCell = document.getElementById(current);
+  let nextCell = document.getElementById(next);
+  for (let i = 0; i < gridArray.length; i++) {
+    if (i === current) {
+      if (next !== undefined) {
+        let snakeCellArray = Array.from(snakeCells);
+        snakeCellArray.push(newSnakeCell);
+        snakeCellArray.forEach((snakeCell) => {
+          snakeCell.style.background = snakeColor;
+        });
+      } else {
+        // first time around
+        currentCell.className = "snake";
+        snakeCells = document.querySelectorAll(".snake");
+        console.log(snakeCells);
+        currentCell.style.background = snakeColor;
+      }
+    }
+  }
+};
+
+// re-render updated grid with snake
+const reRenderGrid = () => {};
 
 // move square on grid
-let nextSquare;
 document.addEventListener("keydown", (e) => {
   switch (e.key) {
     case "ArrowRight":
-      if (snakeIndex === (gridSize * gridSize) - 1) {
-        nextSquare = 0;
+      if (currentSnakeIndex === Math.pow(gridSize, 2) - 1) {
+        nextSnakeIndex = 0;
       } else {
-        nextSquare = snakeIndex + 1;
-      };
-      moveSnake(nextSquare);
-      snakeIndex = nextSquare;
+        nextSnakeIndex = currentSnakeIndex + 1;
+      }
+      setSnake(currentSnakeIndex, nextSnakeIndex);
+      currentSnakeIndex = nextSnakeIndex;
       break;
     case "ArrowLeft":
-      if (snakeIndex === 0) {
-        nextSquare = (gridSize * gridSize) - 1;
+      if (currentSnakeIndex === 0) {
+        nextSnakeIndex = Math.pow(gridSize, 2) - 1;
       } else {
-        nextSquare = snakeIndex - 1;
-      };
-      moveSnake(nextSquare);
-      snakeIndex = nextSquare;
+        nextSnakeIndex = currentSnakeIndex - 1;
+      }
+      setSnake(currentSnakeIndex, nextSnakeIndex);
+      currentSnakeIndex = nextSnakeIndex;
       break;
     case "ArrowUp":
-      if (snakeIndex <= gridSize - 1) {
-        let dif = gridSize - snakeIndex;
-        nextSquare = (gridSize * gridSize) - dif;
+      if (currentSnakeIndex <= gridSize - 1) {
+        let dif = gridSize - currentSnakeIndex;
+        nextSnakeIndex = gridSize * gridSize - dif;
       } else {
-        nextSquare = snakeIndex - gridSize;
-      };
-      moveSnake(nextSquare);
-      snakeIndex = nextSquare;
+        nextSnakeIndex = currentSnakeIndex - gridSize;
+      }
+      setSnake(currentSnakeIndex, nextSnakeIndex);
+      currentSnakeIndex = nextSnakeIndex;
       break;
     case "ArrowDown":
-      if (snakeIndex > (gridSize * gridSize) - gridSize - 1) {
-        let dif = (gridSize * gridSize) - snakeIndex;
-        nextSquare = gridSize - dif;
+      if (currentSnakeIndex > gridSize * gridSize - gridSize - 1) {
+        let dif = gridSize * gridSize - currentSnakeIndex;
+        nextSnakeIndex = gridSize - dif;
       } else {
-        nextSquare = snakeIndex + gridSize;
-      };
-      moveSnake(nextSquare);
-      snakeIndex = nextSquare;
+        nextSnakeIndex = currentSnakeIndex + gridSize;
+      }
+      setSnake(currentSnakeIndex, nextSnakeIndex);
+      currentSnakeIndex = nextSnakeIndex;
       break;
   }
 });
 
-//  swap squares on arrow key press
-const moveSnake = nextIndex => {
-  // old snake <td> 
-  let prevSnakePos = document.querySelector(`.cell${snakeIndex}`);
-  // new snake <td>
-  let nextSnakePos = document.querySelector(`.cell${nextIndex}`);
-  // set old snake to grid color, isSnake: false
-  prevSnakePos.style.background = defaultColor;
-  // set new snake to snake color, isSnake: true
-  nextSnakePos.style.background = snakeColor;
-  //  gridState(nextSnakePos, newIndex)
-};
-
-// set random fruit
-
-// move snake
-
-// game rules
-// snake grows by one after eating fruit
-// snake hits itself
-// snake hits edge
-// snake eats 5 fruit wins round
+// load random grid with ranomd snake head on load
 window.onload = buildGrid();
